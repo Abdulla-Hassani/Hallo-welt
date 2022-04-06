@@ -1,2 +1,4 @@
 # Hallo-welt
-ich bin 24 jahre alt und möchte Codierungen möglichst schnell lernen 
+das ist ein testprojeckt
+ich weiss es nicht wie es funktioniert
+
