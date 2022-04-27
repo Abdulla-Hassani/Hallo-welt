@@ -20,8 +20,8 @@ robot = DriveBase(right_motor,left_motor,wheel_diameter = 54, axle_track= 200)
 light = ColorSensor(Port.S4)
 Rot = 50
 White = 80
-
-
+touch_sensor = TouchSensor(Port.S3)
+#Eingaben
 durchschnitt = (Rot + White )/2
 DRIVE_SPEED = 20
 PROPORTIONAL_GAIN = 1.2
@@ -34,11 +34,12 @@ while True:
         turn_rate = PROPORTIONAL_GAIN * deviation
         robot.drive(DRIVE_SPEED, turn_rate)
         wait(10)
-        if 60>durchschnitt<40:
-            robot.stop()
-            left_motor.brake()
-            right_motor.brake()
-
+        if touch_sensor.pressed():
+          True
+          robot.stop()
+          left_motor.brake()
+          right_motor.brake()
+          
    
 
 
