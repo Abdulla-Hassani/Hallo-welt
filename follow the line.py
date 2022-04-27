@@ -39,6 +39,11 @@ while True:
           robot.stop()
           left_motor.brake()
           right_motor.brake()
+         elif deviation >50:
+          robot.stop()
+          left_motor.brake()
+          right_motor.brake()
+          
           
    
 
