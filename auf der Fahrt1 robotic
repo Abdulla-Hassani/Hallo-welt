@@ -1,0 +1,112 @@
+#!/usr/bin/env pybricks-micropython
+import random
+from pybricks.hubs import EV3Brick
+from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor
+                                ,InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.nxtdevices import LightSensor
+from pybricks.parameters import Port, Stop, Direction, Button, Color
+from pybricks.tools import wait, StopWatch, DataLog
+from pybricks.robotics import DriveBase
+from pybricks.media.ev3dev import SoundFile, ImageFile
+# This program requires LEGO EV3 MicroPython v2.0 or higher.
+# Click "Open user guide" on the EV3 extension tab for more information.
+
+# Create your objects here.
+# Write your program here.
+ev3= EV3Brick()
+ev3.speaker.beep()
+arm_motor=Motor(Port.B, Direction.COUNTERCLOCKWISE,[8,40])
+greifer_motor= Motor(Port.C)
+left_motor= Motor(Port.D)
+right_motor= Motor(Port.A)
+robot = DriveBase(left_motor,right_motor,wheel_diameter=55, axle_track=130)
+light_sensor=LightSensor(Port.S1)
+ultrasonic_sensor=UltrasonicSensor(Port.S3)
+color_sensor=ColorSensor(Port.S4)
+GREEN= Color.GREEN
+BLUE  = Color.BLUE
+YELLOW = Color.YELLOW
+RED = Color.RED
+BROWN = Color.BROWN
+bottlefound = False
+black= Color.BLACK
+StopBrake= Stop.BRAKE
+def driveforward(speed, rotation_angle):
+        left_motor= Motor(Port.D)
+        right_motor= Motor(Port.A)
+        left_motor.run_angle(speed,rotation_angle,Stop.COAST,False)
+        right_motor.run_angle(speed,rotation_angle,Stop.COAST,False)
+def robotstop(speed, rotation_angle):
+        robot.stop()
+        left_motor.brake()
+        right_motor.brake()
+arm_motor.control.limits(speed=20, acceleration=100)
+Black=0
+White=40
+midnumber=(Black+White)/2
+DRIVE_SPEED=50
+PROPOTIONAL_GAIN=1.2
+arm_motor.run_time(0,1000)
+arm_motor.run(10)
+greifer_motor.run_until_stalled(100,then=Stop.HOLD, duty_limit=50)
+greifer_motor.position=0
+arm_motor.hold()
+greifer_motor.reset_angle(0)
+#تاحدی حرکت میکندکه دیگر گنجایش ندارد و بعد میاستد و بعد دوباره به موقعیت اولی اش برمگیردد
+greifer_motor.reset_angle(0)
+def robot_pick(position):
+        greifer_motor.run_target(100,-70)
+        arm_motor.run_target(30,-4)
+        greifer_motor.run_until_stalled(200,then=Stop.HOLD, duty_limit=50)
+        arm_motor.run_target(20,40)
+def robot_release(position):
+        arm_motor.run_target(20,4)
+        greifer_motor.run_target(100,-70)
+        arm_motor.run_target(20,40)
+        greifer_motor.run_target(100,-70)
+def searchingwork(position):
+        left_motor.run(10)
+        right_motor.run(20)
+def moveing(position):
+        left_motor.run_time(20, 2000)
+        right_motor.run_time(20, 2000)
+DOWN = 20
+UP = -20
+while True:
+        if light_sensor.reflection()<60:
+                arm_motor.run(20)
+        elif light_sensor.reflection()>65:
+                arm_motor.run(-20)
+        if 55<light_sensor.reflection()<=60:
+                arm_motor.hold()
+                deviation=color_sensor.reflection()-midnumber
+                turn_rate=PROPOTIONAL_GAIN*deviation
+                robot.drive(DRIVE_SPEED,turn_rate)
+        detectedcolor = color_sensor.color()
+        print(detectedcolor) 
+        if color_sensor.color()==RED:
+                if color_sensor.color()==RED and ultrasonic_sensor.distance()<=65:
+                        robot.stop()
+                        left_motor.hold()
+                        right_motor.hold()
+                        robot_pick(UP)
+                        # robot.straight(-10)
+                        # robot.drive(20,50)
+                        for i in range(1):
+                                robot.turn(300)
+                                robot.straight(50)
+                                while color_sensor.color()==RED:
+                                        left_motor.drive(10)
+                                        right_motor.drive(10)
+                robot.stop()
+                left_motor.hold()
+                while ultrasonic_sensor.distance()>65:
+                        right_motor.run(30)
+                if color_sensor.color()==GREEN:
+                        robot.stop()
+                        left_motor.brake()
+                        right_motor.brake()
+                        robot_release(UP)
+                        robot.straight(-20)
+                        break
+                right_motor.hold()
