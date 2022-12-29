@@ -73,18 +73,18 @@ def moveing(position):
 DOWN = 20
 UP = -20
 while True:
-        if light_sensor.reflection()<60:
+        if light_sensor.reflection()<60:        
                 arm_motor.run(20)
-        elif light_sensor.reflection()>65:
+        elif light_sensor.reflection()>65:        # von der Zeile 76 bis 81 sorgen dafür, dass Arm nicht allzu hoch fährt und in der Höhe 5cm über Boden stehen bleibt.
                 arm_motor.run(-20)
         if 55<light_sensor.reflection()<=60:
                 arm_motor.hold()
                 deviation=color_sensor.reflection()-midnumber
-                turn_rate=PROPOTIONAL_GAIN*deviation
+                turn_rate=PROPOTIONAL_GAIN*deviation       # von der Zeile 80 bis 84 sind für das Fahren entlang der Linie verantwortlich.
                 robot.drive(DRIVE_SPEED,turn_rate)
         detectedcolor = color_sensor.color()
         print(detectedcolor) 
-        if color_sensor.color()==RED:
+        if color_sensor.color()==RED:       # Ein Objekt zum Beispiel Wurfel wird nur dann vom Roboter aufgehoben, wenn der Sensor rote Farbe erkennt und in der Nähe ist. 
                 if color_sensor.color()==RED and ultrasonic_sensor.distance()<=65:
                         robot.stop()
                         left_motor.hold()
@@ -95,14 +95,14 @@ while True:
                         for i in range(1):
                                 robot.turn(300)
                                 robot.straight(50)
-                                while color_sensor.color()==RED:
+                                while color_sensor.color()==RED:      #diese Code kommt praktisch nie im Einsatz, daher könnte man auch abstreichen.
                                         left_motor.drive(10)
                                         right_motor.drive(10)
                 robot.stop()
                 left_motor.hold()
                 while ultrasonic_sensor.distance()>65:
-                        right_motor.run(30)
-                if color_sensor.color()==GREEN:
+                        right_motor.run(30)           # ein Schwachpunkt dabei ist, dass dann auch nach dem Umdrehen das Abiegen nach links beibehalten bleibt.
+                if color_sensor.color()==GREEN:  # das Funktioniert jedoch nur, wenn die Bedingung (Abstand) von der Zeile 88 auch gleichzeitig erfühlt ist.
                         robot.stop()
                         left_motor.brake()
                         right_motor.brake()
