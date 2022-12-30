@@ -95,9 +95,11 @@ while True:
                         for i in range(1):
                                 robot.turn(300)
                                 robot.straight(50)
-                                while color_sensor.color()==RED:      #diese Code kommt praktisch nie im Einsatz, daher könnte man auch abstreichen.
-                                        left_motor.drive(10)
-                                        right_motor.drive(10)
+                                while color_sensor.color()!=RED:      # die drei Codes geben Anweisung, dass falls der Roboter ausserhabl roter Zone ist,
+                                        deviation=color_sensor.reflection()-midnumber  # dem normalen Pfad folgt. 
+                                        turn_rate=PROPOTIONAL_GAIN*deviation
+                                        robot.drive(DRIVE_SPEED,turn_rate)
+                                        
                 robot.stop()
                 left_motor.hold()
                 while ultrasonic_sensor.distance()>65:
