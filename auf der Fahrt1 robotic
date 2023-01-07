@@ -22,15 +22,16 @@ right_motor= Motor(Port.A)
 robot = DriveBase(left_motor,right_motor,wheel_diameter=55, axle_track=130)
 light_sensor=LightSensor(Port.S1)
 ultrasonic_sensor=UltrasonicSensor(Port.S3)
-color_sensor=ColorSensor(Port.S4)
+color_sensor_s4=ColorSensor(Port.S4)
+color_sensor_s1=ColorSensor(Port.S1)
+BLACK = Color.BLACK
 GREEN= Color.GREEN
 BLUE  = Color.BLUE
 YELLOW = Color.YELLOW
 RED = Color.RED
 BROWN = Color.BROWN
 bottlefound = False
-black= Color.BLACK
-StopBrake= Stop.BRAKE
+# StopBrake= Stop.BRAKE
 def driveforward(speed, rotation_angle):
         left_motor= Motor(Port.D)
         right_motor= Motor(Port.A)
@@ -73,17 +74,15 @@ def moveing(position):
 DOWN = 20
 UP = -20
 while True:
-        if light_sensor.reflection()<60:        
+        if light_sensor.reflection()<80:        
                 arm_motor.run(20)
-        elif light_sensor.reflection()>65:        # von der Zeile 76 bis 81 sorgen dafür, dass Arm nicht allzu hoch fährt und in der Höhe 5cm über Boden stehen bleibt.
+        elif light_sensor.reflection()>90:        # von der Zeile 76 bis 81 sorgen dafür, dass Arm nicht allzu hoch fährt und in der Höhe 5cm über Boden stehen bleibt.
                 arm_motor.run(-20)
-        if 55<light_sensor.reflection()<=60:
+        if 80<light_sensor.reflection()<=85:
                 arm_motor.hold()
                 deviation=color_sensor.reflection()-midnumber
                 turn_rate=PROPOTIONAL_GAIN*deviation       # von der Zeile 80 bis 84 sind für das Fahren entlang der Linie verantwortlich.
                 robot.drive(DRIVE_SPEED,turn_rate)
-        detectedcolor = color_sensor.color()
-        print(detectedcolor) 
         if color_sensor.color()==RED:       # Ein Objekt zum Beispiel Wurfel wird nur dann vom Roboter aufgehoben, wenn der Sensor rote Farbe erkennt und in der Nähe ist. 
                 if color_sensor.color()==RED and ultrasonic_sensor.distance()<=65:
                         robot.stop()
@@ -99,7 +98,30 @@ while True:
                                         deviation=color_sensor.reflection()-midnumber  # dem normalen Pfad folgt. 
                                         turn_rate=PROPOTIONAL_GAIN*deviation
                                         robot.drive(DRIVE_SPEED,turn_rate)
-                                        
+                                        if color_sensor_s4.color()==GREEN:
+                                                wait(1000)
+                                                while color_sensor_s1.color()==GREEN:
+                                                        robot.straight(100)
+                                                        robot_release(UP)
+                                                        robot.straight(-100)
+                                                        robot.turn(90)
+                                                while color_sensor_s1.color()==YELLOW:
+                                                        robot.straight(120)
+                                                        robot_release(UP)
+                                                        robot.straight(-120)
+                                                        robot.turn(90)
+                                                while color_sensor_s1.color()==BLUE:
+                                                        robot.turn(20)
+                                                        robot.straight(110)
+                                                        robot_release(UP)
+                                                        robot.straight(-110)
+                                                        robot.turn(70)
+                                                while color_sensor_s1.color()==RED:
+                                                        robot.turn(20)
+                                                        robot.straight(130)
+                                                        robot_release(UP)
+                                                        robot.straight(-130)
+                                                        robot.turn(70)
                 robot.stop()
                 left_motor.hold()
                 while ultrasonic_sensor.distance()>65:
